@@ -1,0 +1,22 @@
+{
+  "players": [
+    { "id": 1, "name": "Jano" },
+    { "id": 2, "name": "Iván" },
+    { "id": 3, "name": "Thiago" },
+    { "id": 4, "name": "Bauti" },
+    { "id": 5, "name": "Zaza" },
+    { "id": 6, "name": "Galo" },
+    { "id": 7, "name": "Sebas" },
+    { "id": 8, "name": "Manu" },
+    { "id": 9, "name": "Samuel" },
+    { "id": 10, "name": "Ulises" },
+    { "id": 11, "name": "Matías" },
+    { "id": 12, "name": "Goro" }
+  ],
+  "groups": null,
+  "groupMatches": [],
+  "qualifiers": null,
+  "playoffs": null,
+  "champion": null,
+  "liveMatchId": null
+}

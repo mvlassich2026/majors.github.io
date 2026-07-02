@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galaxia Major - Panel de Torneo</title>
+<style>
+  :root{
+    --bg:#000000;
+    --bg-panel:#0a0a0c;
+    --bg-panel2:#111114;
+    --bg-card:#15151a;
+    --border:#1f1f26;
+    --border-light:#2c2c36;
+    --text:#f2f3f7;
+    --text-dim:#888a96;
+    --text-dim2:#52525c;
+    --blue:#2f6bff;
+    --blue-glow:#2f6bff4d;
+    --violet:#a142ff;
+    --violet-glow:#a142ff4d;
+    --green:#1fe07e;
+    --green-bg:#1fe07e1a;
+    --red:#ff3b5c;
+    --red-bg:#ff3b5c1a;
+    --yellow:#ffc83d;
+    --gold:#ffd24d;
+  }
+  *{box-sizing:border-box;}
+  ::selection{ background:var(--violet); color:#000; }
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 15% -10%, #1a1230 0%, transparent 45%),
+      radial-gradient(circle at 100% 0%, #0d1f3d 0%, transparent 40%),
+      var(--bg);
+    background-attachment:fixed;
+    color:var(--text);
+    font-family:-apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+    min-height:100vh;
+    letter-spacing:.2px;
+  }
+  header{
+    padding:16px 30px;
+    background:rgba(5,5,7,0.85);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:14px;
+    position:sticky; top:0; z-index:50;
+  }
+  .logo{
+    font-size:24px;
+    font-weight:800;
+    letter-spacing:2px;
+    background:linear-gradient(90deg, #ffffff, var(--blue) 55%, var(--violet));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    text-transform:uppercase;
+  }
+  .logo span{color:var(--text-dim2); font-size:11px; display:block; font-weight:600; letter-spacing:4px; background:none; -webkit-text-fill-color:var(--text-dim2); margin-top:3px;}
+  nav{display:flex; gap:6px; flex-wrap:wrap;}
+  nav button{
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--text-dim);
+    padding:10px 18px;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:.3px;
+    transition:.15s;
+  }
+  nav button:hover{ color:var(--text); border-color:var(--border-light); background:var(--bg-panel2); }
+  nav button.active{
+    background:linear-gradient(135deg, var(--blue), var(--violet));
+    color:#fff;
+    border-color:transparent;
+    box-shadow:0 0 22px var(--violet-glow), inset 0 0 0 1px #ffffff22;
+  }
+  main{ padding:26px 30px 70px; max-width:1500px; margin:0 auto; }
+  .tab-content{ display:none; animation:fadeIn .2s ease; }
+  .tab-content.active{ display:block; }
+  @keyframes fadeIn{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;} }
+
+  h2.section-title{
+    font-size:16px; margin:0 0 18px; padding-bottom:12px;
+    border-bottom:1px solid var(--border);
+    color:var(--text);
+    display:flex; align-items:center; gap:10px;
+    text-transform:uppercase; letter-spacing:1px; font-weight:800;
+  }
+  h2.section-title::before{
+    content:''; width:3px; height:16px;
+    background:linear-gradient(180deg, var(--blue), var(--violet));
+    border-radius:2px;
+    box-shadow:0 0 8px var(--violet-glow);
+  }
+  .panel{
+    background:linear-gradient(180deg, var(--bg-panel), #060607);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:22px;
+    margin-bottom:20px;
+    box-shadow:0 8px 30px -10px #00000099;
+  }
+  .grid{ display:grid; gap:18px; }
+  .grid-3{ grid-template-columns:repeat(3,1fr); }
+  .grid-2{ grid-template-columns:repeat(2,1fr); }
+  @media (max-width:1000px){ .grid-3{grid-template-columns:1fr;} .grid-2{grid-template-columns:1fr;} }
+
+  /* Botones */
+  .btn{
+    border:none; border-radius:6px; padding:11px 18px;
+    font-weight:700; font-size:12px; cursor:pointer;
+    text-transform:uppercase; letter-spacing:.6px;
+    transition:.15s; color:#fff;
+  }
+  .btn:disabled{ opacity:.3; cursor:not-allowed; }
+  .btn-primary{ background:linear-gradient(135deg, var(--blue), var(--violet)); box-shadow:0 4px 18px -2px var(--violet-glow); }
+  .btn-primary:hover:not(:disabled){ filter:brightness(1.2); transform:translateY(-1px); }
+  .btn-secondary{ background:var(--bg-panel2); border:1px solid var(--border-light); color:var(--text); }
+  .btn-secondary:hover{ background:var(--bg-card); border-color:var(--text-dim2); }
+  .btn-danger{ background:transparent; border:1px solid var(--red); color:var(--red); }
+  .btn-danger:hover{ background:var(--red-bg); }
+  .btn-success{ background:var(--green); color:#04130a; }
+  .btn-small{ padding:6px 12px; font-size:10.5px; border-radius:5px; }
+
+  /* Inputs */
+  input[type=text], input[type=number], select{
+    background:#000000;
+    border:1px solid var(--border-light);
+    color:var(--text);
+    border-radius:6px;
+    padding:8px 10px;
+    font-size:13px;
+    outline:none;
+  }
+  input[type=text]:focus, input[type=number]:focus, select:focus{ border-color:var(--blue); box-shadow:0 0 0 3px var(--blue-glow); }
+  input[type=number]{ width:64px; text-align:center; }
+
+  /* Config: jugadores */
+  .players-list{ display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:10px; }
+  .player-row{
+    display:flex; align-items:center; gap:8px;
+    background:var(--bg-panel2); border:1px solid var(--border);
+    padding:8px 10px; border-radius:7px;
+  }
+  .player-row:hover{ border-color:var(--border-light); }
+  .player-row .num{
+    color:var(--text-dim2); font-size:12px; font-weight:800; width:20px;
+  }
+  .player-row input{ flex:1; }
+
+  .actions-row{ display:flex; gap:12px; flex-wrap:wrap; margin-top:16px; }
+
+  /* Tablas de posiciones */
+  table.standings{ width:100%; border-collapse:collapse; font-size:13px; }
+  table.standings th{
+    text-align:left; padding:9px 6px; color:var(--text-dim2);
+    border-bottom:1px solid var(--border); font-size:10.5px; text-transform:uppercase; letter-spacing:.6px;
+  }
+  table.standings td{ padding:10px 6px; border-bottom:1px solid #ffffff06; }
+  table.standings tr:hover td{ background:#ffffff03; }
+  table.standings tr.qualified-1{ background:linear-gradient(90deg, var(--green-bg), transparent); border-left:2px solid var(--green); }
+  table.standings tr.qualified-3{ background:linear-gradient(90deg, #ffc83d1a, transparent); border-left:2px solid var(--yellow); }
+  table.standings td.center, table.standings th.center{ text-align:center; }
+  .pts-badge{ font-weight:800; color:var(--blue); }
+
+  /* Partidos de grupo */
+  .match-card{
+    background:var(--bg-card); border:1px solid var(--border);
+    border-radius:9px; padding:13px 16px; margin-bottom:10px;
+    display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;
+    transition:.15s;
+  }
+  .match-card:hover{ border-color:var(--border-light); }
+  .match-card.played{ border-left:2px solid var(--green); }
+  .match-players{ display:flex; align-items:center; gap:10px; min-width:220px; font-weight:700; }
+  .match-players .vs{ color:var(--text-dim2); font-size:11px; font-weight:800; }
+  .match-form{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .match-form label{ font-size:9.5px; color:var(--text-dim2); text-transform:uppercase; display:block; margin-bottom:3px; letter-spacing:.4px;}
+  .field-group{ display:flex; flex-direction:column; }
+
+  .badge{
+    font-size:9.5px; font-weight:800; padding:3px 9px; border-radius:20px;
+    text-transform:uppercase; letter-spacing:.5px;
+  }
+  .badge-green{ background:var(--green-bg); color:var(--green); border:1px solid var(--green); }
+  .badge-grey{ background:var(--bg-panel2); color:var(--text-dim); border:1px solid var(--border-light); }
+
+  /* Playoffs bracket */
+  .bracket{ display:flex; gap:30px; overflow-x:auto; padding:10px 4px 30px; }
+  .bracket-col{ display:flex; flex-direction:column; justify-content:center; gap:24px; min-width:280px; }
+  .bracket-col h3{ text-align:center; color:var(--text-dim2); font-size:12px; text-transform:uppercase; letter-spacing:1.5px; margin:0 0 6px; font-weight:800;}
+  .po-match{
+    background:var(--bg-card); border:1px solid var(--border); border-radius:9px;
+    padding:13px; position:relative;
+  }
+  .po-match.has-winner{ border-color:var(--green); box-shadow:0 0 18px #1fe07e22; }
+  .po-slot{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:6px 4px; border-radius:5px; font-size:13px; font-weight:700;
+  }
+  .po-slot.winner{ color:var(--green); }
+  .po-slot.loser{ color:var(--text-dim2); text-decoration:line-through; }
+  .po-divider{ height:1px; background:var(--border); margin:4px 0; }
+  .po-mapscore{ font-size:11px; color:var(--text-dim); }
+  .po-form{ margin-top:8px; padding-top:8px; border-top:1px dashed var(--border); display:flex; flex-direction:column; gap:6px; }
+  .po-form-row{ display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+  .maps-history{ font-size:11px; color:var(--text-dim2); margin-top:6px; }
+  .champion-banner{
+    text-align:center; padding:30px; margin-top:10px;
+    background:radial-gradient(circle at 50% 0%, #1a1505, #050505 70%);
+    border:1px solid var(--gold); border-radius:12px;
+    box-shadow:0 0 40px -8px #ffd24d33;
+  }
+  .champion-banner .title{ color:var(--text-dim); letter-spacing:3px; font-size:11px; text-transform:uppercase; font-weight:700; }
+  .champion-banner .name{
+    font-size:40px; font-weight:900; color:var(--gold); margin-top:10px;
+    text-shadow:0 0 30px #ffd24d88;
+    letter-spacing:1px;
+  }
+
+  /* Stream / OBS view */
+  .obs-wrapper{
+    background:#000000; border-radius:14px; padding:40px; border:1px solid var(--border);
+  }
+  .obs-select-bar{ margin-bottom:22px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  .obs-stage{
+    background:radial-gradient(circle at 50% 0%, #14091f 0%, #000 65%);
+    border-radius:16px; padding:40px; text-align:center;
+    border:1px solid var(--border-light);
+  }
+  .obs-round-label{
+    color:var(--violet); text-transform:uppercase; letter-spacing:4px; font-size:12px; font-weight:800; margin-bottom:20px;
+  }
+  .obs-players{ display:flex; align-items:center; justify-content:center; gap:40px; }
+  .obs-player{ flex:1; max-width:320px; }
+  .obs-player .pname{ font-size:28px; font-weight:800; letter-spacing:.3px; }
+  .obs-score{ font-size:68px; font-weight:900; margin-top:8px; font-family:'Courier New', monospace; }
+  .obs-score.blue{ color:var(--blue); text-shadow:0 0 24px var(--blue-glow); }
+  .obs-score.violet{ color:var(--violet); text-shadow:0 0 24px var(--violet-glow); }
+  .obs-vs{ font-size:18px; color:var(--text-dim2); font-weight:800; letter-spacing:1px; }
+  .obs-map{ margin-top:20px; color:var(--text-dim); font-size:13px; letter-spacing:1.5px; text-transform:uppercase; }
+  .obs-live-edit{
+    margin-top:26px; display:flex; justify-content:center; gap:14px; flex-wrap:wrap;
+    background:#0a0a0c; padding:16px; border-radius:9px; border:1px solid var(--border);
+  }
+  .obs-standings{ margin-top:30px; }
+  .empty-msg{ color:var(--text-dim2); text-align:center; padding:46px; font-style:italic; }
+
+  .footer-note{ text-align:center; color:var(--text-dim2); font-size:11px; margin-top:34px; letter-spacing:.4px; }
+  .hidden-file{ display:none; }
+  .group-tag{
+    display:inline-flex; width:24px; height:24px; border-radius:50%;
+    align-items:center; justify-content:center; font-weight:800; font-size:12px;
+    background:#000; border:1px solid var(--border-light); margin-right:8px;
+  }
+  .tagA{ color:var(--blue); border-color:var(--blue); }
+  .tagB{ color:var(--violet); border-color:var(--violet); }
+  .tagC{ color:var(--gold); border-color:var(--gold); }
+
+  /* Entry screen */
+  #entryScreen{
+    position:fixed; inset:0; z-index:1000;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:16px; padding:20px; text-align:center;
+    background:
+      radial-gradient(circle at 15% -10%, #1a1230 0%, transparent 45%),
+      radial-gradient(circle at 100% 0%, #0d1f3d 0%, transparent 40%),
+      var(--bg);
+  }
+  #entryScreen.hidden{ display:none; }
+  #entryLogo{ max-width:220px; max-height:160px; object-fit:contain; margin-bottom:6px; }
+  #entryScreen h1{
+    font-size:30px; margin:0; letter-spacing:2px; text-transform:uppercase; font-weight:800;
+    background:linear-gradient(90deg, #ffffff, var(--blue) 55%, var(--violet));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  #entryScreen p{ color:var(--text-dim); margin:0 0 10px; font-size:13px; }
+  .entry-buttons{ display:flex; gap:12px; flex-wrap:wrap; justify-content:center; }
+  #adminPasswordBox{ display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; justify-content:center; align-items:center; }
+  #appRoot{ display:none; }
+  #appRoot.visible{ display:block; }
+
+  .mode-badge{
+    font-size:10.5px; font-weight:800; padding:4px 10px; border-radius:20px;
+    text-transform:uppercase; letter-spacing:.5px; border:1px solid var(--border-light);
+  }
+  .mode-badge.admin{ color:var(--gold); border-color:var(--gold); background:#ffd24d1a; }
+  .mode-badge.viewer{ color:var(--text-dim); }
+  .header-right{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .icon-btn{
+    background:transparent; border:1px solid var(--border); color:var(--text-dim);
+    width:32px; height:32px; border-radius:6px; cursor:pointer; font-size:14px;
+  }
+  .icon-btn:hover{ border-color:var(--border-light); color:var(--text); }
+
+  #publishBanner{
+    display:none; background:#0d1f3d; border-bottom:1px solid var(--blue);
+    color:#cfe0ff; padding:9px 30px; font-size:12.5px; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+  }
+  #publishBanner.show{ display:flex; }
+  .readonly-note{ color:var(--text-dim2); font-size:11.5px; font-style:italic; }
+</style>
+</head>
+<body>
+
+<!-- PANTALLA DE ENTRADA -->
+<div id="entryScreen">
+  <img id="entryLogo" src="logo.png" alt="Logo" onerror="this.style.display='none'">
+  <h1>Galaxia Major</h1>
+  <p>Torneo CS 1v1 — elegí cómo querés ingresar</p>
+  <div class="entry-buttons">
+    <button id="btnEnterViewer" class="btn btn-secondary">👁 Entrar como Espectador</button>
+    <button id="btnEnterAdmin" class="btn btn-primary">🔑 Entrar como Administrador</button>
+  </div>
+  <div id="adminPasswordBox" style="display:none;">
+    <input type="password" id="adminPasswordInput" placeholder="Contraseña de administrador">
+    <button id="btnConfirmAdmin" class="btn btn-primary btn-small">Confirmar</button>
+  </div>
+  <div id="adminError" style="display:none; color:var(--red); font-size:12px;">Contraseña incorrecta.</div>
+</div>
+
+<audio id="bgMusic" src="song.mp3" loop></audio>
+
+<div id="appRoot">
+
+<header>
+  <div class="logo">Galaxia Major<span>Panel de torneo — CS 1v1</span></div>
+  <nav id="navTabs">
+    <button data-tab="config" class="active" data-admin-only>⚙ Configuración</button>
+    <button data-tab="groups">📊 Fase de Grupos</button>
+    <button data-tab="playoffs">🏆 Playoffs</button>
+    <button data-tab="stream">📺 Vista Stream/OBS</button>
+  </nav>
+  <div class="header-right">
+    <button id="btnToggleMusic" class="icon-btn" title="Silenciar/Reproducir música">🔊</button>
+    <span id="modeBadge" class="mode-badge viewer">Espectador</span>
+    <button id="btnLogout" class="btn btn-secondary btn-small" style="display:none;">Salir</button>
+  </div>
+</header>
+
+<div id="publishBanner">
+  <span>⚡ Tenés cambios sin publicar. Descargá el <strong>data.json</strong> actualizado y subilo al repositorio para que los demás lo vean.</span>
+  <button id="btnPublishNow" class="btn btn-primary btn-small">⬇ Descargar data.json</button>
+</div>
+
+<div id="storageWarning" style="display:none; background:#3a2a00; border-bottom:1px solid #6b4f00; color:#ffc83d; padding:9px 30px; font-size:12.5px; align-items:center; justify-content:space-between; gap:10px;">
+  <span>⚠ Tu navegador bloqueó el almacenamiento local: los datos funcionan con normalidad pero <strong>no se guardarán</strong> al cerrar esta pestaña. Usá "Exportar Torneo" para no perder el progreso.</span>
+  <button onclick="document.getElementById('storageWarning').style.display='none'" style="background:none;border:1px solid #ffc83d;color:#ffc83d;border-radius:4px;padding:3px 9px;cursor:pointer;font-size:11px;">Cerrar</button>
+</div>
+
+<main>
+
+  <!-- TAB CONFIGURACION -->
+  <section id="tab-config" class="tab-content active">
+    <div class="panel">
+      <h2 class="section-title">Jugadores (12)</h2>
+      <div id="playersList" class="players-list"></div>
+    </div>
+
+    <div class="panel">
+      <h2 class="section-title">Sorteo de Grupos</h2>
+      <p style="color:var(--text-dim); font-size:13px;">Divide aleatoriamente a los 12 jugadores en 3 grupos de 4 (A, B y C) y genera el fixture de todos contra todos. <strong style="color:var(--red)">Esta acción reinicia resultados y playoffs.</strong></p>
+      <div class="actions-row">
+        <button class="btn btn-primary" id="btnSorteo">🎲 Realizar Sorteo</button>
+        <button class="btn btn-danger" id="btnResetAll">🗑 Reiniciar Torneo Completo</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2 class="section-title">Publicar Resultados</h2>
+      <p style="color:var(--text-dim); font-size:13px;">
+        Los cambios que hacés (resultados, sorteo, playoffs) se guardan solo en <strong>este navegador</strong>.
+        Para que los espectadores los vean en GitHub Pages, hacé lo siguiente:
+      </p>
+      <ol style="color:var(--text-dim); font-size:13px; line-height:1.7;">
+        <li>Tocá <strong>"Descargar data.json"</strong> abajo (se descarga a tu carpeta de Descargas).</li>
+        <li>Reemplazá el archivo <code>data.json</code> dentro de la carpeta de tu repositorio por el que acabás de descargar.</li>
+        <li>Ejecutá en la terminal, dentro de la carpeta del repo:<br>
+          <code>git add data.json</code><br>
+          <code>git commit -m "Actualizar resultados"</code><br>
+          <code>git push</code>
+        </li>
+        <li>En 1-2 minutos GitHub Pages actualiza el sitio con los nuevos datos.</li>
+      </ol>
+      <div class="actions-row">
+        <button class="btn btn-primary" id="btnExport">⬇ Descargar data.json</button>
+        <button class="btn btn-secondary" id="btnExportBackup">⬇ Copia de seguridad con fecha</button>
+        <button class="btn btn-secondary" id="btnImportTrigger">⬆ Importar torneo (.json)</button>
+        <input type="file" id="fileImport" class="hidden-file" accept="application/json">
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB GRUPOS -->
+  <section id="tab-groups" class="tab-content">
+    <div id="groupsContainer"></div>
+  </section>
+
+  <!-- TAB PLAYOFFS -->
+  <section id="tab-playoffs" class="tab-content">
+    <div id="playoffsContainer"></div>
+  </section>
+
+  <!-- TAB STREAM -->
+  <section id="tab-stream" class="tab-content">
+    <div id="streamContainer"></div>
+  </section>
+
+  <div class="footer-note">Galaxia Major · Datos publicados desde data.json · Cambios de administrador se guardan localmente hasta publicarlos</div>
+</main>
+
+</div><!-- /appRoot -->
+
+<script>
+/* ============================================================
+   ESTADO Y PERSISTENCIA
+   ============================================================ */
+const STORAGE_KEY = 'galaxiaMajorState_v1';
+const DEFAULT_PLAYERS = ["Jano","Iván","Thiago","Bauti","Zaza","Galo","Sebas","Manu","Samuel","Ulises","Matías","Goro"];
+const MAPS = ["de_dust2","de_mirage","de_inferno","de_nuke","de_overpass","de_ancient","de_anubis","de_vertigo","de_train"];
+
+function getDefaultState(){
+  return {
+    players: DEFAULT_PLAYERS.map((n,i)=>({ id:i+1, name:n })),
+    groups: null,            // { A:[ids], B:[ids], C:[ids] }
+    groupMatches: [],        // [{id,group,p1,p2,score1,score2,mapName,played}]
+    qualifiers: null,        // array de 8 ids en orden de seed
+    playoffs: null,          // { quarterfinals:[], semifinals:[], final:[] }
+    champion: null,
+    liveMatchId: null
+  };
+}
+
+/* ============================================================
+   AUTENTICACIÓN (modo administrador / espectador)
+   ============================================================
+   ADMIN_PASSWORD_HASH es el SHA-256 (hex) de la contraseña de admin.
+   Para generar el hash de tu propia contraseña, abrí la consola del
+   navegador en esta página y ejecutá:
+
+   crypto.subtle.digest('SHA-256', new TextEncoder().encode('TU_PASSWORD'))
+     .then(b => console.log(Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('')));
+
+   Copiá el resultado y reemplazá el valor de ADMIN_PASSWORD_HASH abajo.
+   Contraseña por defecto de este archivo: "galaxia2026"
+   ============================================================ */
+const ADMIN_PASSWORD_HASH = "c17cd382617f46f8eb154c477b714f724a8431b71dfa96e5dedac82efda28e6c"; // sha256("galaxia2026") — CAMBIAR
+
+let isAdmin = false;
+let dirtySinceLastPublish = false;
+
+async function sha256Hex(str){
+  const enc = new TextEncoder().encode(str);
+  const buf = await crypto.subtle.digest('SHA-256', enc);
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+function applyModeToUI(){
+  document.body.classList.toggle('is-admin', isAdmin);
+  document.querySelectorAll('[data-admin-only]').forEach(el=>{ el.style.display = isAdmin ? '' : 'none'; });
+  const badge = document.getElementById('modeBadge');
+  if(badge){
+    badge.textContent = isAdmin ? '⚡ Administrador' : '👁 Espectador';
+    badge.className = 'mode-badge ' + (isAdmin ? 'admin' : 'viewer');
+  }
+  const logoutBtn = document.getElementById('btnLogout');
+  if(logoutBtn) logoutBtn.style.display = isAdmin ? '' : 'none';
+  if(!isAdmin) switchTab('groups');
+}
+
+function markDirty(){
+  if(!isAdmin) return;
+  dirtySinceLastPublish = true;
+  const banner = document.getElementById('publishBanner');
+  if(banner) banner.classList.add('show');
+}
+
+function logoutAdmin(){
+  isAdmin = false;
+  sessionStorage.removeItem('galaxiaAdminSession');
+  applyModeToUI();
+  renderAll();
+}
+
+let state = null;
+let storageAvailable = true;
+let storageWarningShown = false;
+const memoryFallback = {};
+
+function checkStorageAvailable(){
+  try{
+    const testKey = '__galaxia_test__';
+    localStorage.setItem(testKey, '1');
+    localStorage.removeItem(testKey);
+    return true;
+  }catch(e){
+    return false;
+  }
+}
+storageAvailable = checkStorageAvailable();
+
+function loadStateFromLocalStorage(){
+  try{
+    const raw = storageAvailable ? localStorage.getItem(STORAGE_KEY) : memoryFallback[STORAGE_KEY];
+    if(!raw) return null;
+    const parsed = JSON.parse(raw);
+    if(!parsed.players || !Array.isArray(parsed.players)) return null;
+    return parsed;
+  }catch(e){
+    console.error('Error cargando estado desde localStorage.', e);
+    return null;
+  }
+}
+
+// Carga inicial: intenta primero data.json (la fuente publicada en el repo).
+// Si un administrador tiene cambios locales sin publicar más recientes en
+// localStorage, se le ofrece continuar con esos en vez de perderlos.
+async function loadInitialState(){
+  let published = null;
+  try{
+    const res = await fetch('data.json', { cache:'no-store' });
+    if(res.ok){
+      const parsed = await res.json();
+      if(parsed && Array.isArray(parsed.players)) published = parsed;
+    }
+  }catch(e){
+    console.warn('No se pudo cargar data.json (¿estás abriendo el archivo localmente sin servidor?). Se intentará localStorage.', e);
+  }
+
+  const local = loadStateFromLocalStorage();
+
+  if(local && local.__savedAt && published){
+    // Si hay cambios locales guardados después de la última publicación conocida,
+    // le avisamos al admin y le dejamos elegir con cuál seguir.
+    if((!published.__savedAt || local.__savedAt > published.__savedAt)){
+      const useLocal = confirm('Encontramos cambios guardados en este navegador que no fueron publicados a data.json todavía. ¿Querés continuar con esos cambios locales? (Cancelar = usar la versión publicada en data.json)');
+      if(useLocal) return local;
+    }
+  }
+
+  if(published) return published;
+  if(local) return local;
+  return getDefaultState();
+}
+
+function saveState(){
+  try{
+    state.__savedAt = Date.now();
+    const data = JSON.stringify(state);
+    if(storageAvailable){
+      localStorage.setItem(STORAGE_KEY, data);
+    }else{
+      memoryFallback[STORAGE_KEY] = data;
+      showStorageWarningOnce();
+    }
+  }catch(e){
+    console.error('Error guardando estado, se usa memoria temporal.', e);
+    storageAvailable = false;
+    memoryFallback[STORAGE_KEY] = JSON.stringify(state);
+    showStorageWarningOnce();
+  }
+  markDirty();
+}
+
+function showStorageWarningOnce(){
+  if(storageWarningShown) return;
+  storageWarningShown = true;
+  const el = document.getElementById('storageWarning');
+  if(el) el.style.display = 'flex';
+}
+
+state = getDefaultState(); // se reemplaza por loadInitialState() al ingresar
+
+/* ============================================================
+   UTILIDADES
+   ============================================================ */
+function playerName(id){
+  if(id===null || id===undefined) return '—';
+  const p = state.players.find(pl=>pl.id===id);
+  return p ? p.name : '—';
+}
+
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]] = [arr[j],arr[i]];
+  }
+  return arr;
+}
+
+function combinations2(arr){
+  const res=[];
+  for(let i=0;i<arr.length;i++){
+    for(let j=i+1;j<arr.length;j++){
+      res.push([arr[i],arr[j]]);
+    }
+  }
+  return res;
+}
+
+function mapOptions(selected){
+  return MAPS.map(m=>`<option value="${m}" ${m===selected?'selected':''}>${m}</option>`).join('');
+}
+
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ============================================================
+   LOGICA: SORTEO Y FIXTURE
+   ============================================================ */
+function doSorteo(){
+  if(!confirm('Esto reiniciará grupos, resultados de grupos y playoffs. ¿Continuar?')) return;
+  const ids = state.players.map(p=>p.id);
+  shuffle(ids);
+  const groups = { A: ids.slice(0,4), B: ids.slice(4,8), C: ids.slice(8,12) };
+  let groupMatches = [];
+  ['A','B','C'].forEach(g=>{
+    combinations2(groups[g]).forEach((pair, idx)=>{
+      groupMatches.push({
+        id: g+'-'+idx, group:g, p1:pair[0], p2:pair[1],
+        score1:null, score2:null,
+        mapName: MAPS[idx % MAPS.length], played:false
+      });
+    });
+  });
+  state.groups = groups;
+  state.groupMatches = groupMatches;
+  state.qualifiers = null;
+  state.playoffs = null;
+  state.champion = null;
+  state.liveMatchId = null;
+  saveState();
+  renderAll();
+}
+
+function resetAllTournament(){
+  if(!confirm('¿Seguro que querés reiniciar TODO el torneo? Se perderán jugadores personalizados, grupos, resultados y playoffs.')) return;
+  state = getDefaultState();
+  saveState();
+  renderAll();
+}
+
+function updatePlayerName(id, value){
+  const p = state.players.find(pl=>pl.id===id);
+  if(p){
+    p.name = value.trim() === '' ? p.name : value;
+    saveState();
+  }
+}
+
+/* ============================================================
+   LOGICA: STANDINGS DE GRUPO
+   ============================================================ */
+function computeStandings(group){
+  if(!state.groups || !state.groups[group]) return [];
+  const ids = state.groups[group];
+  const stats = {};
+  ids.forEach(id=>{
+    stats[id] = { id, name: playerName(id), pj:0, v:0, d:0, rf:0, ra:0, pts:0 };
+  });
+  state.groupMatches.filter(m=>m.group===group && m.played).forEach(m=>{
+    const s1 = stats[m.p1], s2 = stats[m.p2];
+    if(!s1 || !s2) return;
+    s1.pj++; s2.pj++;
+    s1.rf += m.score1; s1.ra += m.score2;
+    s2.rf += m.score2; s2.ra += m.score1;
+    if(m.score1 > m.score2){ s1.v++; s1.pts+=3; s2.d++; }
+    else { s2.v++; s2.pts+=3; s1.d++; }
+  });
+  const arr = Object.values(stats).map(s=>({...s, dr: s.rf - s.ra}));
+  arr.sort((a,b)=> b.pts - a.pts || b.dr - a.dr);
+  return arr;
+}
+
+function groupComplete(group){
+  if(!state.groups) return false;
+  return state.groupMatches.filter(m=>m.group===group).every(m=>m.played) &&
+         state.groupMatches.filter(m=>m.group===group).length === 6;
+}
+
+function allGroupsComplete(){
+  return state.groups && ['A','B','C'].every(g=>groupComplete(g));
+}
+
+/* ============================================================
+   LOGICA: CARGA DE RESULTADOS DE GRUPO
+   ============================================================ */
+function saveGroupMatch(matchId){
+  const m = state.groupMatches.find(mm=>mm.id===matchId);
+  if(!m){ alert('Partido no encontrado.'); return; }
+  const s1el = document.getElementById('s1-'+matchId);
+  const s2el = document.getElementById('s2-'+matchId);
+  const mapEl = document.getElementById('map-'+matchId);
+  const score1 = parseInt(s1el.value, 10);
+  const score2 = parseInt(s2el.value, 10);
+
+  if(isNaN(score1) || isNaN(score2) || score1 < 0 || score2 < 0){
+    alert('Ingresá un marcador de rondas válido para ambos jugadores.');
+    return;
+  }
+  if(score1 === score2){
+    alert('El partido se juega a una sola ronda (no se permite empate): un jugador debe ganar.');
+    return;
+  }
+  if(Math.max(score1, score2) !== 13){
+    alert('El ganador del partido debe llegar exactamente a 13 rondas.');
+    return;
+  }
+
+  m.score1 = score1; m.score2 = score2;
+  m.mapName = mapEl ? mapEl.value : m.mapName;
+  m.played = true;
+
+  saveState();
+  renderGroups();
+  renderStream();
+}
+
+function clearGroupMatch(matchId){
+  const m = state.groupMatches.find(mm=>mm.id===matchId);
+  if(!m) return;
+  if(!confirm('¿Borrar el resultado de este partido?')) return;
+  m.score1 = null; m.score2 = null; m.played = false;
+  saveState();
+  renderGroups();
+  renderStream();
+}
+
+/* ============================================================
+   LOGICA: CLASIFICACION Y GENERACION DE PLAYOFFS
+   ============================================================ */
+function computeQualifiersAndSeed(){
+  if(!allGroupsComplete()){
+    alert('Deben completarse los 18 partidos de la fase de grupos (6 por grupo) antes de generar los playoffs.');
+    return;
+  }
+  if(state.playoffs && !confirm('Ya existen playoffs generados. ¿Querés regenerarlos? Se perderán los resultados de playoffs actuales.')) return;
+
+  const standingsByGroup = { A: computeStandings('A'), B: computeStandings('B'), C: computeStandings('C') };
+  const cmp = (a,b)=> b.pts - a.pts || b.dr - a.dr;
+
+  const firsts = ['A','B','C'].map(g=>standingsByGroup[g][0]).sort(cmp);
+  const seconds = ['A','B','C'].map(g=>standingsByGroup[g][1]).sort(cmp);
+  const thirds = ['A','B','C'].map(g=>standingsByGroup[g][2]).sort(cmp);
+  const qualifiedThirds = thirds.slice(0,2);
+
+  const seeds = [...firsts, ...seconds, ...qualifiedThirds].map(p=>p.id); // 8 ids, orden de seed 1..8
+
+  state.qualifiers = seeds;
+  state.playoffs = buildBracket(seeds);
+  state.champion = null;
+  saveState();
+  renderAll();
+}
+
+function mkMatch(id, p1, p2, format){
+  return { id, p1, p2, format, maps: [], winner: null };
+}
+
+function buildBracket(seeds){
+  const qf = [
+    mkMatch('qf1', seeds[0], seeds[7], 'BO1'),
+    mkMatch('qf2', seeds[3], seeds[4], 'BO1'),
+    mkMatch('qf3', seeds[2], seeds[5], 'BO1'),
+    mkMatch('qf4', seeds[1], seeds[6], 'BO1'),
+  ];
+  const sf = [
+    mkMatch('sf1', null, null, 'BO3'),
+    mkMatch('sf2', null, null, 'BO3'),
+  ];
+  const final = [ mkMatch('final', null, null, 'BO3') ];
+  return { quarterfinals: qf, semifinals: sf, final: final };
+}
+
+function findMatch(matchId){
+  if(!state.playoffs) return null;
+  return state.playoffs.quarterfinals.find(m=>m.id===matchId) ||
+         state.playoffs.semifinals.find(m=>m.id===matchId) ||
+         state.playoffs.final.find(m=>m.id===matchId) || null;
+}
+
+/* ============================================================
+   LOGICA: RESULTADOS DE PLAYOFFS (POR MAPA)
+   ============================================================ */
+function addMapResult(matchId){
+  const m = findMatch(matchId);
+  if(!m){ alert('Partido no encontrado.'); return; }
+  if(!m.p1 || !m.p2){ alert('Aún no están definidos ambos jugadores de este partido.'); return; }
+  if(m.winner){ alert('Este partido ya tiene un ganador. Reiniciá el partido si necesitás corregirlo.'); return; }
+
+  const mapEl = document.getElementById('pomap-'+matchId);
+  const s1el = document.getElementById('pos1-'+matchId);
+  const s2el = document.getElementById('pos2-'+matchId);
+
+  const score1 = parseInt(s1el.value, 10);
+  const score2 = parseInt(s2el.value, 10);
+
+  if(isNaN(score1) || isNaN(score2) || score1 < 0 || score2 < 0){
+    alert('Ingresá un marcador de rondas válido.');
+    return;
+  }
+  if(score1 === score2){
+    alert('En playoffs el mapa debe tener un ganador (no se permiten empates). Cargá el resultado de la prórroga.');
+    return;
+  }
+
+  const winnerId = score1 > score2 ? m.p1 : m.p2;
+  m.maps.push({ mapName: mapEl.value, score1, score2, winner: winnerId });
+
+  const winsNeeded = m.format === 'BO1' ? 1 : 2;
+  const w1 = m.maps.filter(mm=>mm.winner===m.p1).length;
+  const w2 = m.maps.filter(mm=>mm.winner===m.p2).length;
+
+  if(w1 >= winsNeeded || w2 >= winsNeeded){
+    m.winner = w1 >= winsNeeded ? m.p1 : m.p2;
+    propagateWinner(matchId, m.winner);
+  }
+
+  s1el.value=''; s2el.value='';
+
+  saveState();
+  renderPlayoffs();
+  renderStream();
+}
+
+function propagateWinner(matchId, winnerId){
+  const po = state.playoffs;
+  if(matchId==='qf1') po.semifinals[0].p1 = winnerId;
+  else if(matchId==='qf2') po.semifinals[0].p2 = winnerId;
+  else if(matchId==='qf3') po.semifinals[1].p1 = winnerId;
+  else if(matchId==='qf4') po.semifinals[1].p2 = winnerId;
+  else if(matchId==='sf1') po.final[0].p1 = winnerId;
+  else if(matchId==='sf2') po.final[0].p2 = winnerId;
+  else if(matchId==='final') state.champion = winnerId;
+}
+
+function resetDownstream(matchId){
+  const po = state.playoffs;
+  if(matchId==='qf1'){ po.semifinals[0].p1=null; resetMatch('sf1'); }
+  else if(matchId==='qf2'){ po.semifinals[0].p2=null; resetMatch('sf1'); }
+  else if(matchId==='qf3'){ po.semifinals[1].p1=null; resetMatch('sf2'); }
+  else if(matchId==='qf4'){ po.semifinals[1].p2=null; resetMatch('sf2'); }
+  else if(matchId==='sf1'){ po.final[0].p1=null; resetMatch('final'); }
+  else if(matchId==='sf2'){ po.final[0].p2=null; resetMatch('final'); }
+  else if(matchId==='final'){ state.champion=null; }
+}
+
+function resetMatch(matchId){
+  const m = findMatch(matchId);
+  if(m){ m.maps = []; m.winner = null; }
+  resetDownstream(matchId);
+}
+
+function resetPlayoffMatch(matchId){
+  if(!confirm('¿Reiniciar este partido? Se perderán los resultados de este partido y de las rondas siguientes asociadas.')) return;
+  resetMatch(matchId);
+  saveState();
+  renderAll();
+}
+
+function undoLastMap(matchId){
+  const m = findMatch(matchId);
+  if(!m || m.maps.length===0) return;
+  if(m.winner) resetDownstream(matchId);
+  m.maps.pop();
+  m.winner = null;
+  saveState();
+  renderPlayoffs();
+  renderStream();
+}
+
+/* ============================================================
+   RENDER: TABS
+   ============================================================ */
+document.getElementById('navTabs').addEventListener('click', (e)=>{
+  const btn = e.target.closest('button[data-tab]');
+  if(!btn) return;
+  switchTab(btn.dataset.tab);
+});
+
+function switchTab(tab){
+  document.querySelectorAll('#navTabs button').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
+  document.querySelectorAll('.tab-content').forEach(s=>s.classList.toggle('active', s.id==='tab-'+tab));
+}
+
+/* ============================================================
+   RENDER: CONFIGURACION
+   ============================================================ */
+function renderConfig(){
+  const list = document.getElementById('playersList');
+  list.innerHTML = state.players.map((p,i)=>`
+    <div class="player-row">
+      <span class="num">${i+1}</span>
+      <input type="text" value="${escapeHtml(p.name)}" onchange="updatePlayerName(${p.id}, this.value)">
+    </div>
+  `).join('');
+}
+
+document.getElementById('btnSorteo').addEventListener('click', doSorteo);
+document.getElementById('btnResetAll').addEventListener('click', resetAllTournament);
+document.getElementById('btnExport').addEventListener('click', ()=>{
+  exportTournament();
+  dirtySinceLastPublish = false;
+  const banner = document.getElementById('publishBanner');
+  if(banner) banner.classList.remove('show');
+});
+document.getElementById('btnExportBackup').addEventListener('click', exportTournamentBackup);
+document.getElementById('btnImportTrigger').addEventListener('click', ()=>document.getElementById('fileImport').click());
+document.getElementById('fileImport').addEventListener('change', importTournament);
+
+function exportTournament(){
+  try{
+    const dataStr = JSON.stringify(state, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    // Se descarga como data.json para reemplazar directamente el archivo
+    // del repositorio y publicarlo con git add / commit / push.
+    a.download = `data.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }catch(e){
+    console.error(e);
+    alert('Ocurrió un error al exportar el torneo.');
+  }
+}
+
+function exportTournamentBackup(){
+  try{
+    const dataStr = JSON.stringify(state, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const fecha = new Date().toISOString().slice(0,10);
+    a.href = url;
+    a.download = `galaxia-major-backup-${fecha}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }catch(e){
+    console.error(e);
+    alert('Ocurrió un error al exportar la copia de seguridad.');
+  }
+}
+
+function importTournament(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      const parsed = JSON.parse(e.target.result);
+      if(!parsed.players || !Array.isArray(parsed.players)){
+        alert('El archivo no tiene un formato válido de torneo Galaxia Major.');
+        return;
+      }
+      if(!confirm('Esto reemplazará todos los datos actuales del torneo por los del archivo importado. ¿Continuar?')) return;
+      state = Object.assign(getDefaultState(), parsed);
+      saveState();
+      renderAll();
+      alert('Torneo importado correctamente.');
+    }catch(err){
+      console.error(err);
+      alert('No se pudo leer el archivo. Asegurate de que sea un .json válido exportado desde esta misma app.');
+    }finally{
+      event.target.value = '';
+    }
+  };
+  reader.onerror = function(){
+    alert('Error al leer el archivo.');
+  };
+  reader.readAsText(file);
+}
+
+/* ============================================================
+   RENDER: FASE DE GRUPOS
+   ============================================================ */
+function renderGroups(){
+  const container = document.getElementById('groupsContainer');
+  if(!state.groups){
+    container.innerHTML = `<div class="panel"><div class="empty-msg">Todavía no se realizó el sorteo de grupos. Vayan a la pestaña <strong>Configuración</strong> para sortear a los 12 jugadores.</div></div>`;
+    return;
+  }
+
+  let html = '';
+
+  ['A','B','C'].forEach(g=>{
+    const standings = computeStandings(g);
+    const matches = state.groupMatches.filter(m=>m.group===g);
+    const qualThirdIds = getQualifiedThirdIds();
+
+    html += `<div class="panel">
+      <h2 class="section-title"><span class="group-tag tag${g}">${g}</span> Grupo ${g}</h2>
+      <table class="standings">
+        <thead><tr>
+          <th>#</th><th>Jugador</th><th class="center">PJ</th><th class="center">V</th><th class="center">D</th>
+          <th class="center">Rondas</th><th class="center">Dif.</th><th class="center">Pts</th>
+        </tr></thead>
+        <tbody>
+        ${standings.map((s,idx)=>{
+          let rowClass='';
+          if(idx<2) rowClass='qualified-1';
+          else if(state.qualifiers && qualThirdIds.includes(s.id)) rowClass='qualified-3';
+          return `<tr class="${rowClass}">
+            <td>${idx+1}</td>
+            <td>${escapeHtml(s.name)}</td>
+            <td class="center">${s.pj}</td>
+            <td class="center">${s.v}</td>
+            <td class="center">${s.d}</td>
+            <td class="center">${s.rf}-${s.ra}</td>
+            <td class="center">${s.dr>0?'+':''}${s.dr}</td>
+            <td class="center pts-badge">${s.pts}</td>
+          </tr>`;
+        }).join('')}
+        </tbody>
+      </table>
+      <div style="margin-top:6px; font-size:11px; color:var(--text-dim);">
+        <span class="badge badge-green">Verde</span> Clasificación directa (Top 2) &nbsp;
+        <span class="badge" style="background:#eab3081f;color:var(--yellow);border:1px solid var(--yellow);">Amarillo</span> Mejor tercero clasificado
+      </div>
+
+      <div style="margin-top:18px;">
+        ${matches.map(m=>renderGroupMatchCard(m)).join('')}
+      </div>
+    </div>`;
+  });
+
+  const complete = allGroupsComplete();
+  html += `<div class="panel">
+    <h2 class="section-title">Clasificación a Playoffs</h2>
+    <p style="color:var(--text-dim); font-size:13px;">Pasan a cuartos de final los 2 primeros de cada grupo (6) más los 2 mejores terceros (2) = 8 jugadores. Criterio: Puntos → Diferencia de rondas.</p>
+    ${isAdmin ? `
+      <button class="btn btn-primary" id="btnGenPlayoffs" ${complete?'':'disabled'}>🏁 ${state.playoffs ? 'Regenerar' : 'Generar'} Playoffs</button>
+      ${!complete ? `<p style="color:var(--red); font-size:12px; margin-top:8px;">Faltan partidos por cargar en la fase de grupos.</p>` : ''}
+    ` : ''}
+    ${state.qualifiers ? renderQualifiersPreview() : ''}
+  </div>`;
+
+  container.innerHTML = html;
+  const btnGen = document.getElementById('btnGenPlayoffs');
+  if(btnGen) btnGen.addEventListener('click', computeQualifiersAndSeed);
+}
+
+function getQualifiedThirdIds(){
+  if(!state.qualifiers || !state.groups) return [];
+  const firstSecondIds = new Set();
+  ['A','B','C'].forEach(g=>{
+    const st = computeStandings(g);
+    if(st[0]) firstSecondIds.add(st[0].id);
+    if(st[1]) firstSecondIds.add(st[1].id);
+  });
+  return state.qualifiers.filter(id=>!firstSecondIds.has(id));
+}
+
+function renderQualifiersPreview(){
+  return `<div style="margin-top:14px; font-size:13px;">
+    <strong>Jugadores clasificados (seeds 1-8):</strong>
+    <ol style="color:var(--text-dim);">
+      ${state.qualifiers.map(id=>`<li>${escapeHtml(playerName(id))}</li>`).join('')}
+    </ol>
+  </div>`;
+}
+
+function renderGroupMatchCard(m){
+  const n1 = escapeHtml(playerName(m.p1));
+  const n2 = escapeHtml(playerName(m.p2));
+
+  if(!isAdmin){
+    return `<div class="match-card ${m.played?'played':''}">
+      <div class="match-players">
+        ${n1} <span class="vs">VS</span> ${n2}
+        ${m.played ? `<span class="badge badge-green">Jugado</span>` : `<span class="badge badge-grey">Pendiente</span>`}
+      </div>
+      <div class="match-form">
+        ${m.played
+          ? `<span class="pts-badge">${m.score1} - ${m.score2}</span> <span class="readonly-note">${escapeHtml(m.mapName)}</span>`
+          : `<span class="readonly-note">Sin jugar todavía</span>`}
+      </div>
+    </div>`;
+  }
+
+  return `<div class="match-card ${m.played?'played':''}">
+    <div class="match-players">
+      ${n1} <span class="vs">VS</span> ${n2}
+      ${m.played ? `<span class="badge badge-green">Jugado</span>` : `<span class="badge badge-grey">Pendiente</span>`}
+    </div>
+    <div class="match-form">
+      <div class="field-group">
+        <label>Mapa</label>
+        <select id="map-${m.id}">${mapOptions(m.mapName)}</select>
+      </div>
+      <div class="field-group">
+        <label>Rondas ${n1}</label>
+        <input type="number" id="s1-${m.id}" min="0" value="${m.score1 ?? ''}">
+      </div>
+      <div class="field-group">
+        <label>Rondas ${n2}</label>
+        <input type="number" id="s2-${m.id}" min="0" value="${m.score2 ?? ''}">
+      </div>
+      <button class="btn btn-primary btn-small" onclick="saveGroupMatch('${m.id}')">Guardar</button>
+      ${m.played ? `<button class="btn btn-secondary btn-small" onclick="clearGroupMatch('${m.id}')">Borrar</button>` : ''}
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   RENDER: PLAYOFFS
+   ============================================================ */
+function renderPlayoffs(){
+  const container = document.getElementById('playoffsContainer');
+  if(!state.playoffs){
+    container.innerHTML = `<div class="panel"><div class="empty-msg">Los playoffs todavía no fueron generados. Completá la fase de grupos y generá la clasificación desde la pestaña <strong>Fase de Grupos</strong>.</div></div>`;
+    return;
+  }
+
+  const po = state.playoffs;
+  let html = `<div class="panel"><h2 class="section-title">Árbol de Eliminación</h2>
+  <div class="bracket">
+    <div class="bracket-col"><h3>Cuartos de Final (BO1)</h3>
+      ${po.quarterfinals.map(m=>renderPoMatch(m,'Cuartos')).join('')}
+    </div>
+    <div class="bracket-col"><h3>Semifinales (BO3)</h3>
+      ${po.semifinals.map(m=>renderPoMatch(m,'Semifinal')).join('')}
+    </div>
+    <div class="bracket-col"><h3>Final (BO3)</h3>
+      ${po.final.map(m=>renderPoMatch(m,'Final')).join('')}
+    </div>
+  </div>`;
+
+  if(state.champion){
+    html += `<div class="champion-banner">
+      <div class="title">🏆 Campeón Galaxia Major 🏆</div>
+      <div class="name">${escapeHtml(playerName(state.champion))}</div>
+    </div>`;
+  }
+
+  html += `</div>`;
+  container.innerHTML = html;
+}
+
+function renderPoMatch(m, roundLabel){
+  const p1Defined = m.p1 !== null && m.p1 !== undefined;
+  const p2Defined = m.p2 !== null && m.p2 !== undefined;
+  const w1 = m.maps.filter(mm=>mm.winner===m.p1).length;
+  const w2 = m.maps.filter(mm=>mm.winner===m.p2).length;
+
+  return `<div class="po-match ${m.winner?'has-winner':''}">
+    <div class="po-slot ${m.winner && m.winner===m.p1 ? 'winner' : (m.winner ? 'loser':'')}">
+      <span>${p1Defined ? escapeHtml(playerName(m.p1)) : 'Por definir'}</span>
+      <span>${m.maps.length ? w1 : ''}</span>
+    </div>
+    <div class="po-divider"></div>
+    <div class="po-slot ${m.winner && m.winner===m.p2 ? 'winner' : (m.winner ? 'loser':'')}">
+      <span>${p2Defined ? escapeHtml(playerName(m.p2)) : 'Por definir'}</span>
+      <span>${m.maps.length ? w2 : ''}</span>
+    </div>
+
+    ${m.maps.length ? `<div class="maps-history">
+      ${m.maps.map((mm,i)=>`Mapa ${i+1} (${mm.mapName}): ${mm.score1}-${mm.score2}`).join(' · ')}
+    </div>` : ''}
+
+    ${isAdmin && !m.winner && p1Defined && p2Defined ? `
+      <div class="po-form">
+        <div class="po-form-row">
+          <select id="pomap-${m.id}">${mapOptions(MAPS[0])}</select>
+        </div>
+        <div class="po-form-row">
+          <div class="field-group"><label>Rondas ${escapeHtml(playerName(m.p1))}</label><input type="number" id="pos1-${m.id}" min="0"></div>
+          <div class="field-group"><label>Rondas ${escapeHtml(playerName(m.p2))}</label><input type="number" id="pos2-${m.id}" min="0"></div>
+        </div>
+        <div class="po-form-row">
+          <button class="btn btn-primary btn-small" onclick="addMapResult('${m.id}')">Cargar Mapa</button>
+          ${m.maps.length ? `<button class="btn btn-secondary btn-small" onclick="undoLastMap('${m.id}')">Deshacer último</button>` : ''}
+        </div>
+      </div>` : ''}
+
+    ${isAdmin && m.maps.length ? `<div class="po-form-row" style="margin-top:8px;">
+      <button class="btn btn-danger btn-small" onclick="resetPlayoffMatch('${m.id}')">Reiniciar Partido</button>
+    </div>` : ''}
+  </div>`;
+}
+
+/* ============================================================
+   RENDER: STREAM / OBS
+   ============================================================ */
+function getAllSelectableMatches(){
+  const list = [];
+  if(state.groups){
+    state.groupMatches.forEach(m=>{
+      list.push({ id:m.id, label:`Grupo ${m.group}: ${playerName(m.p1)} vs ${playerName(m.p2)}`, kind:'group' });
+    });
+  }
+  if(state.playoffs){
+    const roundNames = { qf:'Cuartos', sf:'Semifinal', final:'Final' };
+    [...state.playoffs.quarterfinals, ...state.playoffs.semifinals, ...state.playoffs.final].forEach(m=>{
+      if(m.p1 && m.p2){
+        const rn = m.id.startsWith('qf') ? roundNames.qf : (m.id.startsWith('sf') ? roundNames.sf : roundNames.final);
+        list.push({ id:m.id, label:`${rn}: ${playerName(m.p1)} vs ${playerName(m.p2)}`, kind:'playoff' });
+      }
+    });
+  }
+  return list;
+}
+
+function renderStream(){
+  const container = document.getElementById('streamContainer');
+  const selectable = getAllSelectableMatches();
+
+  if(selectable.length === 0){
+    container.innerHTML = `<div class="panel"><div class="empty-msg">Aún no hay partidos disponibles. Realizá el sorteo de grupos primero.</div></div>`;
+    return;
+  }
+
+  if(!state.liveMatchId || !selectable.find(s=>s.id===state.liveMatchId)){
+    state.liveMatchId = selectable[0].id;
+  }
+
+  let matchObj = state.groupMatches.find(m=>m.id===state.liveMatchId);
+  let isGroup = !!matchObj;
+  if(!isGroup) matchObj = findMatch(state.liveMatchId);
+
+  let html = `<div class="obs-select-bar">
+    <label style="color:var(--text-dim); font-size:13px;">Partido en vivo:</label>
+    <select id="liveMatchSelect">
+      ${selectable.map(s=>`<option value="${s.id}" ${s.id===state.liveMatchId?'selected':''}>${escapeHtml(s.label)}</option>`).join('')}
+    </select>
+  </div>`;
+
+  html += `<div class="obs-wrapper">`;
+
+  if(!matchObj){
+    html += `<div class="empty-msg">Seleccioná un partido para mostrar.</div>`;
+  } else if(isGroup){
+    html += renderObsGroupMatch(matchObj);
+  } else {
+    html += renderObsPlayoffMatch(matchObj);
+  }
+
+  html += `</div>`;
+
+  container.innerHTML = html;
+
+  const sel = document.getElementById('liveMatchSelect');
+  if(sel){
+    sel.addEventListener('change', (e)=>{
+      state.liveMatchId = e.target.value;
+      saveState();
+      renderStream();
+    });
+  }
+}
+
+function renderObsGroupMatch(m){
+  const standings = computeStandings(m.group);
+  return `
+    <div class="obs-stage">
+      <div class="obs-round-label">Fase de Grupos · Grupo ${m.group}</div>
+      <div class="obs-players">
+        <div class="obs-player">
+          <div class="pname">${escapeHtml(playerName(m.p1))}</div>
+          <div class="obs-score blue">${m.score1 ?? 0}</div>
+        </div>
+        <div class="obs-vs">VS</div>
+        <div class="obs-player">
+          <div class="pname">${escapeHtml(playerName(m.p2))}</div>
+          <div class="obs-score violet">${m.score2 ?? 0}</div>
+        </div>
+      </div>
+      <div class="obs-map">Mapa: ${escapeHtml(m.mapName)} ${m.played ? '· Finalizado' : '· En curso'}</div>
+
+      ${isAdmin ? `<div class="obs-live-edit">
+        <div class="field-group"><label>Mapa</label><select id="map-${m.id}">${mapOptions(m.mapName)}</select></div>
+        <div class="field-group"><label>Rondas P1</label><input type="number" id="s1-${m.id}" min="0" value="${m.score1 ?? ''}"></div>
+        <div class="field-group"><label>Rondas P2</label><input type="number" id="s2-${m.id}" min="0" value="${m.score2 ?? ''}"></div>
+        <button class="btn btn-primary btn-small" onclick="saveGroupMatch('${m.id}')">Actualizar Marcador</button>
+      </div>` : ''}
+    </div>
+
+    <div class="obs-standings">
+      <h2 class="section-title">Tabla de Posiciones · Grupo ${m.group}</h2>
+      <table class="standings">
+        <thead><tr><th>#</th><th>Jugador</th><th class="center">PJ</th><th class="center">Dif.</th><th class="center">Pts</th></tr></thead>
+        <tbody>
+          ${standings.map((s,idx)=>`<tr class="${idx<2?'qualified-1':''}">
+            <td>${idx+1}</td><td>${escapeHtml(s.name)}</td><td class="center">${s.pj}</td>
+            <td class="center">${s.dr>0?'+':''}${s.dr}</td><td class="center pts-badge">${s.pts}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function renderObsPlayoffMatch(m){
+  const roundName = m.id.startsWith('qf') ? 'Cuartos de Final' : (m.id.startsWith('sf') ? 'Semifinal' : 'GRAN FINAL');
+  const w1 = m.maps.filter(mm=>mm.winner===m.p1).length;
+  const w2 = m.maps.filter(mm=>mm.winner===m.p2).length;
+  const lastMap = m.maps.length ? m.maps[m.maps.length-1] : null;
+
+  return `
+    <div class="obs-stage">
+      <div class="obs-round-label">Playoffs · ${roundName} · ${m.format}</div>
+      <div class="obs-players">
+        <div class="obs-player">
+          <div class="pname">${escapeHtml(playerName(m.p1))}</div>
+          <div class="obs-score blue">${w1}</div>
+        </div>
+        <div class="obs-vs">VS</div>
+        <div class="obs-player">
+          <div class="pname">${escapeHtml(playerName(m.p2))}</div>
+          <div class="obs-score violet">${w2}</div>
+        </div>
+      </div>
+      <div class="obs-map">
+        ${lastMap ? `Último mapa: ${escapeHtml(lastMap.mapName)} (${lastMap.score1}-${lastMap.score2})` : 'Aguardando inicio del mapa'}
+        ${m.winner ? ` · Ganador: ${escapeHtml(playerName(m.winner))}` : ''}
+      </div>
+
+      ${isAdmin && !m.winner ? `<div class="obs-live-edit">
+        <div class="field-group"><label>Mapa</label><select id="pomap-${m.id}">${mapOptions(MAPS[0])}</select></div>
+        <div class="field-group"><label>Rondas ${escapeHtml(playerName(m.p1))}</label><input type="number" id="pos1-${m.id}" min="0"></div>
+        <div class="field-group"><label>Rondas ${escapeHtml(playerName(m.p2))}</label><input type="number" id="pos2-${m.id}" min="0"></div>
+        <button class="btn btn-primary btn-small" onclick="addMapResult('${m.id}')">Cargar Mapa</button>
+      </div>` : ''}
+    </div>
+  `;
+}
+
+/* ============================================================
+   RENDER ALL
+   ============================================================ */
+function renderAll(){
+  renderConfig();
+  renderGroups();
+  renderPlayoffs();
+  renderStream();
+}
+
+/* ============================================================
+   PANTALLA DE ENTRADA / ARRANQUE DE LA APP
+   ============================================================ */
+async function enterApp(){
+  document.getElementById('entryScreen').classList.add('hidden');
+  document.getElementById('appRoot').classList.add('visible');
+
+  const music = document.getElementById('bgMusic');
+  music.volume = 0.5;
+  music.play().catch(()=>{ /* el navegador puede bloquear autoplay; el usuario puede darle play manual */ });
+
+  state = await loadInitialState();
+  applyModeToUI();
+  renderAll();
+}
+
+document.getElementById('btnEnterViewer').addEventListener('click', ()=>{
+  isAdmin = false;
+  enterApp();
+});
+
+document.getElementById('btnEnterAdmin').addEventListener('click', ()=>{
+  if(sessionStorage.getItem('galaxiaAdminSession') === '1'){
+    isAdmin = true;
+    enterApp();
+    return;
+  }
+  document.getElementById('adminPasswordBox').style.display = 'flex';
+  document.getElementById('adminPasswordInput').focus();
+});
+
+async function attemptAdminLogin(){
+  const input = document.getElementById('adminPasswordInput');
+  const errorEl = document.getElementById('adminError');
+  const hash = await sha256Hex(input.value);
+  if(hash === ADMIN_PASSWORD_HASH){
+    isAdmin = true;
+    sessionStorage.setItem('galaxiaAdminSession', '1');
+    errorEl.style.display = 'none';
+    enterApp();
+  }else{
+    errorEl.style.display = 'block';
+    input.value = '';
+    input.focus();
+  }
+}
+
+document.getElementById('btnConfirmAdmin').addEventListener('click', attemptAdminLogin);
+document.getElementById('adminPasswordInput').addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter') attemptAdminLogin();
+});
+
+document.getElementById('btnLogout').addEventListener('click', ()=>{
+  if(confirm('¿Salir del modo administrador?')) logoutAdmin();
+});
+
+document.getElementById('btnToggleMusic').addEventListener('click', ()=>{
+  const music = document.getElementById('bgMusic');
+  const btn = document.getElementById('btnToggleMusic');
+  if(music.paused){ music.play().catch(()=>{}); btn.textContent = '🔊'; }
+  else{ music.pause(); btn.textContent = '🔇'; }
+});
+
+document.getElementById('btnPublishNow').addEventListener('click', ()=>{
+  exportTournament();
+  dirtySinceLastPublish = false;
+  document.getElementById('publishBanner').classList.remove('show');
+});
+
+// Si ya había una sesión de administrador activa en esta pestaña, saltar el login
+if(sessionStorage.getItem('galaxiaAdminSession') === '1'){
+  isAdmin = true;
+  document.getElementById('adminPasswordBox').style.display = 'none';
+}
+</script>
+</body>
+</html>
